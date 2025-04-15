@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Struttura Database - Sistema Controllo Luminoso | IV A INF</title>
+    <style>
+        :root {
+            --primary: #3a86ff;
+            --secondary: #8338ec;
+            --dark: #212529;
+            --light: #f8f9fa;
+            --success: #28a745;
+            --warning: #ffc107;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background-color: var(--light);
+            margin: 0;
+            padding: 0;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        nav {
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        nav ul {
+            display: flex;
+            justify-content: center;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        nav li {
+            padding: 1rem 2rem;
+        }
+        
+        nav a {
+            color: var(--dark);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        nav a:hover {
+            color: var(--primary);
+        }
+        
+        section {
+            padding: 3rem 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        h1, h2, h3 {
+            margin-top: 0;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        h2 {
+            color: var(--primary);
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary);
+        }
+        
+        h3 {
+            color: var(--secondary);
+            font-size: 1.5rem;
+            margin: 1.5rem 0 1rem;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+        }
+        
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+        
+        th {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        
+        pre {
+            background-color: #f5f5f5;
+            padding: 1rem;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        
+        code {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #f5f5f5;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-size: 0.9em;
+        }
+        
+        .sql-keyword {
+            color: #0077b6;
+            font-weight: bold;
+        }
+        
+        .sql-type {
+            color: #9d4edd;
+        }
+        
+        .sql-comment {
+            color: #6c757d;
+            font-style: italic;
+        }
+        
+        footer {
+            background-color: var(--dark);
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 2rem;
+        }
+        
+        .authors {
+            font-style: italic;
+            margin-top: 2rem;
+        }
+        
+        @media (max-width: 768px) {
+            nav ul {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            nav li {
+                padding: 0.5rem 1rem;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            h2 {
+                font-size: 1.7rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Struttura del Database</h1>
+            <p>Schema completo del sistema di controllo luminoso</p>
+        </div>
+    </header>
+    
+    <nav>
+        <ul>
+            <li><a href="#tabelle">Tabelle</a></li>
+            <li><a href="#relazioni">Relazioni</a></li>
+            <li><a href="#indici">Indici</a></li>
+        </ul>
+    </nav>
+    
+    <div class="container">
+        <section id="tabelle">
+            <h2>Struttura delle Tabelle</h2>
+            
+            <div class="card">
+                <h3>Tabella: azioni_servo</h3>
+                <pre><code>CREATE TABLE <span class="sql-keyword">`azioni_servo`</span> (
+  <span class="sql-keyword">`id_azione`</span> <span class="sql-type">bigint(20)</span> <span class="sql-keyword">NOT NULL</span>,
+  <span class="sql-keyword">`id_dispositivo`</span> <span class="sql-type">int(11)</span> <span class="sql-keyword">NOT NULL</span>,
+  <span class="sql-keyword">`posizione_target`</span> <span class="sql-type">float</span> <span class="sql-keyword">NOT NULL</span>,
+  <span class="sql-keyword">`posizione_effettiva`</span> <span class="sql-type">float</span> <span class="sql-keyword">DEFAULT NULL</span>,
+  <span class="sql-keyword">`durata_ms`</span> <span class="sql-type">int(11)</span> <span class="sql-keyword">DEFAULT NULL</span>,
+  <span class="sql-keyword">`timestamp`</span> <span class="sql-type">timestamp</span> <span class="sql-keyword">NOT NULL DEFAULT</span> current_timestamp(),
+  <span class="sql-keyword">`attivato_da`</span> <span class="sql-type">enum('automatico','manuale','programmazione','remoto')</span> <span class="sql-keyword">NOT NULL</span>
+) <span class="sql-keyword">ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci</span>;</code></pre>
+            </div>
+            
+            <div class="card">
+                <h3>Tabella: dispositivi</h3>
+                <pre><code>CREATE TABLE <span class="sql-keyword">`dispositivi`</span> (
+  <span class="sql-keyword">`id_dispositivo`</span> <span class="sql-type">int(11)</span> <span class="sql-keyword">NOT NULL</span>,
+  <span class="sql-keyword">`nome_dispositivo`</span> <span class="sql-type">varchar(50)</span> <span class="sql-keyword">NOT NULL</span>,
+  <span class="sql-keyword">`tipo_dispositivo`</span> <span class="sql-type">enum('LDR','Servo','ADC','Altro')</span> <span class="sql-keyword">NOT NULL</span>,
+  <span class="sql-keyword">`pin_gpio`</span> <span class="sql-type">int(11)</span> <span class="sql-keyword">DEFAULT NULL</span>,
+  <span class="sql-keyword">`valore_minimo`</span> <span class="sql-type">float</span> <span class="sql-keyword">DEFAULT NULL</span>,
+  <span class="sql-keyword">`valore_massimo`</span> <span class="sql-type">float</span> <span class="sql-keyword">DEFAULT NULL</span>,
+  <span class="sql-keyword">`fattore_calibrazione`</span> <span class="sql-type">float</span> <span class="sql-keyword">DEFAULT 1</span>,
+  <span class="sql-keyword">`attivo`</span> <span class="sql-type">tinyint(1)</span> <span class="sql-keyword">DEFAULT 1</span>,
+  <span class="sql-keyword">`data_ultima_calibrazione`</span> <span class="sql-type">date</span> <span class="sql-keyword">DEFAULT NULL</span>,
+  <span class="sql-keyword">`descrizione`</span> <span class="sql-type">text</span> <span class="sql-keyword">DEFAULT NULL</span>,
+  <span class="sql-keyword">`data_creazione`</span> <span class="sql-type">timestamp</span> <span class="sql-keyword">NOT NULL DEFAULT</span> current_timestamp(),
+  <span class="sql-keyword">`data_aggiornamento`</span> <span class="sql-type">timestamp</span> <span class="sql-keyword">NOT NULL DEFAULT</span> current_timestamp() <span class="sql-keyword">ON UPDATE</span> current_timestamp()
+) <span class="sql-keyword">ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci</span>;</code></pre>
+            </div>
+            
+            <div class="card">
+                <h3>Tabella: log_sensori</h3>
+                <pre><code>CREATE TABLE <span class="sql-keyword">`log_sensori`</span> (
+  <span class="sql-keyword">`id_log`</span> <span class="sql-type">bigint(20)</span> <span class="sql-keyword">NOT NULL</span>,
+  <span class="sql-keyword">`id_dispositivo`</span> <span class="sql-type">int(11)</span> <span class="sql-keyword">NOT NULL</span>,
+  <span class="sql-keyword">`valore_letto`</span> <span class="sql-type">float</span> <span class="sql-keyword">NOT NULL</span>,
+  <span class="sql-keyword">`valore_normalizzato`</span> <span class="sql-type">float</span> <span class="sql-keyword">DEFAULT NULL</span>,
+  <span class="sql-keyword">`timestamp`</span> <span class="sql-type">timestamp</span> <span class="sql-keyword">NOT NULL DEFAULT</span> current_timestamp()
+) <span class="sql-keyword">ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci</span>;</code></pre>
+            </div>
+            
+            <!-- Altre tabelle possono essere aggiunte qui -->
+        </section>
+        
+        <section id="relazioni">
+            <h2>Relazioni tra Tabelle</h2>
+            
+            <div class="card">
+                <h3>Diagramma delle Relazioni</h3>
+                <div class="diagram">
+                    <pre>
+dispositivi (1) ──── (N) azioni_servo
+      │
+      └─────── (N) log_sensori
+      │
+      └─────── (N) programmazioni
+                    </pre>
+                </div>
+                
+                <h3>Vincoli di Chiave Esterna</h3>
+                <pre><code><span class="sql-keyword">ALTER TABLE</span> <span class="sql-keyword">`azioni_servo`</span>
+<span class="sql-keyword">ADD CONSTRAINT</span> <span class="sql-keyword">`azioni_servo_ibfk_1`</span> <span class="sql-keyword">FOREIGN KEY</span> (<span class="sql-keyword">`id_dispositivo`</span>) <span class="sql-keyword">REFERENCES</span> <span class="sql-keyword">`dispositivi`</span> (<span class="sql-keyword">`id_dispositivo`</span>);
+
+<span class="sql-keyword">ALTER TABLE</span> <span class="sql-keyword">`log_sensori`</span>
+<span class="sql-keyword">ADD CONSTRAINT</span> <span class="sql-keyword">`log_sensori_ibfk_1`</span> <span class="sql-keyword">FOREIGN KEY</span> (<span class="sql-keyword">`id_dispositivo`</span>) <span class="sql-keyword">REFERENCES</span> <span class="sql-keyword">`dispositivi`</span> (<span class="sql-keyword">`id_dispositivo`</span>);
+
+<span class="sql-keyword">ALTER TABLE</span> <span class="sql-keyword">`programmazioni`</span>
+<span class="sql-keyword">ADD CONSTRAINT</span> <span class="sql-keyword">`programmazioni_ibfk_1`</span> <span class="sql-keyword">FOREIGN KEY</span> (<span class="sql-keyword">`id_dispositivo`</span>) <span class="sql-keyword">REFERENCES</span> <span class="sql-keyword">`dispositivi`</span> (<span class="sql-keyword">`id_dispositivo`</span>);</code></pre>
+            </div>
+        </section>
+        
+        <section id="indici">
+            <h2>Indici e Chiavi</h2>
+            
+            <div class="card">
+                <h3>Indici Primari</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Tabella</th>
+                            <th>Campo</th>
+                            <th>Tipo</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>azioni_servo</td>
+                            <td>id_azione</td>
+                            <td>PRIMARY KEY</td>
+                        </tr>
+                        <tr>
+                            <td>dispositivi</td>
+                            <td>id_dispositivo</td>
+                            <td>PRIMARY KEY</td>
+                        </tr>
+                        <tr>
+                            <td>log_sensori</td>
+                            <td>id_log</td>
+                            <td>PRIMARY KEY</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <h3>Indici Secondari</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Tabella</th>
+                            <th>Campi</th>
+                            <th>Scopo</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>azioni_servo</td>
+                            <td>id_dispositivo, timestamp</td>
+                            <td>Ricerca per dispositivo e data</td>
+                        </tr>
+                        <tr>
+                            <td>log_sensori</td>
+                            <td>id_dispositivo, timestamp</td>
+                            <td>Analisi storica per sensore</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+    
+    <footer>
+        <div class="container">
+            <h3>Struttura Database - Sistema Controllo Luminoso</h3>
+            <p>Documentazione tecnica completa</p>
+            <div class="authors">
+                <p><strong>Autori</strong>: Giovanni Crispo, Cristian Memoli</p>
+                <p><strong>Classe</strong>: IV A INF</p>
+                <p><strong>Licenza</strong>: Open Source (GPL 3.0)</p>
+            </div>
+            <p><em>Documentazione aggiornata al 2025</em></p>
+            <a href="sistema_controllo_luminoso.sql" class="btn" download>Scarica il Database SQL</a>
+        </div>
+    </footer>
+    
+    <script>
+        // Smooth scrolling per i link di navigazione
+        document.querySelectorAll('nav a').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+        
+        // Evidenziazione della sezione attiva
+        const sections = document.querySelectorAll('section');
+        const navLinks = document.querySelectorAll('nav a');
+        
+        window.addEventListener('scroll', () => {
+            let current = '';
+            
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                
+                if (pageYOffset >= (sectionTop - 100)) {
+                    current = section.getAttribute('id');
+                }
+            });
+            
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${current}`) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
