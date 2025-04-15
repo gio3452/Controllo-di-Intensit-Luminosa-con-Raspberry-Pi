@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controllo Luminoso con Raspberry Pi | IV A INF</title>
+    <style>
+        :root {
+            --primary: #3a86ff;
+            --secondary: #8338ec;
+            --dark: #212529;
+            --light: #f8f9fa;
+            --success: #28a745;
+            --warning: #ffc107;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background-color: var(--light);
+            margin: 0;
+            padding: 0;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        nav {
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        nav ul {
+            display: flex;
+            justify-content: center;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        nav li {
+            padding: 1rem 2rem;
+        }
+        
+        nav a {
+            color: var(--dark);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        nav a:hover {
+            color: var(--primary);
+        }
+        
+        section {
+            padding: 3rem 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        h1, h2, h3 {
+            margin-top: 0;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        h2 {
+            color: var(--primary);
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary);
+        }
+        
+        h3 {
+            color: var(--secondary);
+            font-size: 1.5rem;
+            margin: 1.5rem 0 1rem;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+        }
+        
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+        
+        th {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        
+        pre {
+            background-color: #f5f5f5;
+            padding: 1rem;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        
+        code {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #f5f5f5;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-size: 0.9em;
+        }
+        
+        .diagram {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin: 2rem 0;
+            overflow-x: auto;
+        }
+        
+        .btn {
+            display: inline-block;
+            background-color: var(--primary);
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn:hover {
+            background-color: #2a75e6;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        footer {
+            background-color: var(--dark);
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 2rem;
+        }
+        
+        .authors {
+            font-style: italic;
+            margin-top: 2rem;
+        }
+        
+        @media (max-width: 768px) {
+            nav ul {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            nav li {
+                padding: 0.5rem 1rem;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            h2 {
+                font-size: 1.7rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Controllo di Intensità Luminosa con Raspberry Pi</h1>
+            <p>Un sistema avanzato per la regolazione automatica dell'illuminazione</p>
+        </div>
+    </header>
+    
+    <nav>
+        <ul>
+            <li><a href="#introduzione">Introduzione</a></li>
+            <li><a href="#componenti">Componenti</a></li>
+            <li><a href="#circuito">Circuito</a></li>
+            <li><a href="#software">Software</a></li>
+            <li><a href="#integrazione">Integrazione</a></li>
+            <li><a href="#test">Test</a></li>
+            <li><a href="#database">Database</a></li>
+        </ul>
+    </nav>
+    
+    <div class="container">
+        <section id="introduzione">
+            <h2>1. Introduzione</h2>
+            
+            <div class="card">
+                <h3>1.0 Scopo del Progetto</h3>
+                <p>Questo progetto unisce tecnologia, efficienza e rispetto per l’ambiente, dimostrando come soluzioni semplici possano contribuire a un futuro più sostenibile.Un progetto basato su Raspberry Pi per il controllo dell’intensità luminosa rappresenta una scelta innovativa, sostenibile ed efficiente. Ecco i principali vantaggi:</p>
+                <ul>
+                    <li><strong> Risparmio Energetico</strong>l sistema regola automaticamente la luce in base alle condizioni ambientali (es. luce naturale o presenza di persone), riducendo gli sprechi e ottimizzando i consumi.</li>
+                    <li><strong>Sostenibilità Ambientale</strong> L’uso di sensori e algoritmi intelligenti minimizza l’impatto energetico, allineandosi con gli obiettivi di riduzione delle emissioni e di utilizzo di energie rinnovabili.</li>
+                    <li><strong>Basso Costo e Accessibilità </strong> Raspberry Pi è un dispositivo economico, a basso consumo e versatile, perfetto per prototipi e soluzioni IoT scalabili.</li>
+                    <li><strong>Flessibilità e Personalizzazione </strong> Può essere programmato per scenari diversi (case, uffici, strade) e integrato con altri sistemi smart (es. domotica).</li>
+                    <li><strong>Educazione e Innovazione </strong> Promuove l’apprendimento di elettronica, programmazione e sostenibilità, avvicinando gli utenti alle tecnologie green.</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h3>1.1 Scopo del Progetto</h3>
+                <p>Questo progetto ha l'obiettivo di creare un sistema automatizzato di regolazione dell'illuminazione in ambienti interni/esterni, sfruttando:</p>
+                <ul>
+                    <li><strong>Fotoresistori (LDR)</strong> per il rilevamento della luce ambientale</li>
+                    <li><strong>Servo motore</strong> per regolare tende, persiane o orientamento di lampade</li>
+                    <li><strong>Raspberry Pi</strong> come cervello centrale, offrendo maggiore flessibilità rispetto ad Arduino</li>
+                </ul>
+            </div>
+            
+            <div class="card">
+                <h3>1.2 Vantaggi rispetto alla versione Arduino</h3>
+                <div class="advantages">
+                    <p>✔ <strong>Elaborazione dati avanzata</strong> (log, machine learning per ottimizzazione energetica)</p>
+                    <p>✔ <strong>Connessione Internet</strong> (controllo remoto via Telegram/Web)</p>
+                    <p>✔ <strong>Integrazione con Home Assistant</strong> per automazione domestica</p>
+                    <p>✔ <strong>Espandibilità</strong> (aggiunta di sensori di temperatura, umidità, ecc.)</p>
+                </div>
+            </div>
+        </section>
+        
+        <section id="componenti">
+            <h2>2. Componenti e Specifiche Tecniche</h2>
+            
+            <div class="card">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Componente</th>
+                            <th>Specifiche</th>
+                            <th>Ruolo nel Progetto</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Raspberry Pi 4</strong></td>
+                            <td>4GB RAM, GPIO a 40 pin, Wi-Fi/Bluetooth</td>
+                            <td>Unità di controllo principale</td>
+                        </tr>
+                        <tr>
+                            <td><strong>MCP3008 (ADC)</strong></td>
+                            <td>Convertitore Analogico-Digitale a 10 bit, 8 canali</td>
+                            <td>Legge i valori degli LDR</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Fotoresistori (LDR)</strong></td>
+                            <td>Resistenza variabile da ~1kΩ (luce diretta) a ~10kΩ (buio)</td>
+                            <td>Misura l'intensità luminosa</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Servo Motore (SG90)</strong></td>
+                            <td>Tensione: 4.8V-6V, Coppia: 1.8kg/cm, Rotazione: 0°-180°</td>
+                            <td>Regola l'orientamento di tende/luci</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Resistori (10kΩ)</strong></td>
+                            <td>Tolleranza 5%</td>
+                            <td>Partitore di tensione per LDR</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Breadboard & Jumper</strong></td>
+                            <td>Cavi maschio-maschio/maschio-femmina</td>
+                            <td>Collegamento circuitale</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p class="note"><em>Nota: Se si usa un Raspberry Pi 5, verificare la compatibilità dei pin GPIO.</em></p>
+            </div>
+        </section>
+        
+        <section id="circuito">
+            <h2>3. Schema Elettrico e Cablaggio</h2>
+            
+            <div class="card">
+                <h3>3.1 Diagramma Circuitale</h3>
+                <div class="diagram">
+                    <pre>
+                        <img src="https://i.imgur.com/KCQmu3b.png" alt="Descrizione dell'immagine" width="750"> <a href:"https://imgur.com/KCQmu3b"></a>
+                    </pre>
+                </div>
+                
+                <h3>3.2 Spiegazione Collegamenti</h3>
+                <ul>
+                    <li><strong>LDR</strong>: Ogni fotoresistore forma un partitore di tensione con un resistore da 10kΩ. Il segnale analogico viene letto tramite <strong>MCP3008</strong>.</li>
+                    <li><strong>Servo Motore</strong>:
+                        <ul>
+                            <li><strong>PWM (Segnale)</strong> → GPIO18 (PWM software)</li>
+                            <li><strong>Alimentazione</strong> → Pin 5V del Raspberry Pi (<em>usare alimentazione esterna se il servo richiede più corrente</em>)</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </section>
+        
+        <section id="software">
+            <h2>4. Configurazione Software</h2>
+            
+            <div class="card">
+                <h3>4.1 Dipendenze</h3>
+                <pre><code>sudo apt update
+sudo apt install python3-dev python3-pip
+sudo pip3 install RPi.GPIO gpiozero spidev</code></pre>
+                
+                <h3>4.2 Codice Python Avanzato</h3>
+                <pre><code>#!/usr/bin/env python3
+import time
+import spidev
+from gpiozero import Servo, PWMOutputDevice
+
+# Configurazione ADC (MCP3008)
+spi = spidev.SpiDev()
+spi.open(0, 0)  # Bus SPI 0, dispositivo 0
+spi.max_speed_hz = 1350000
+
+# Configurazione Servo
+servo = Servo(18)  # GPIO18 per PWM
+
+# Soglie e parametri
+THRESHOLD = 0.15  # Differenza minima per attivare il servo
+SMOOTHING = 0.1   # Filtro per ridurre rumore sui sensori
+
+def read_ldr(channel):
+    """Legge un valore LDR dal canale specifico (0-7)"""
+    adc = spi.xfer2([1, (8 + channel) << 4, 0])
+    return ((adc[1] & 3) << 8) + adc[2] / 1023.0
+
+def moving_average(new_value, last_value):
+    """Applica un filtro passa-basso per smussare i dati"""
+    return SMOOTHING * new_value + (1 - SMOOTHING) * last_value
+
+try:
+    ldr1, ldr2 = 0.5, 0.5  # Valori iniziali
+    while True:
+        # Lettura LDR con filtro
+        new_ldr1 = read_ldr(0)
+        new_ldr2 = read_ldr(1)
+        ldr1 = moving_average(new_ldr1, ldr1)
+        ldr2 = moving_average(new_ldr2, ldr2)
+
+        # Controllo servo
+        diff = ldr1 - ldr2
+        if abs(diff) > THRESHOLD:
+            servo.value = max(-1, min(1, servo.value - diff * 0.2))
+
+        print(f"LDR1: {ldr1:.2f}, LDR2: {ldr2:.2f}, Servo: {servo.value:.2f}")
+        time.sleep(0.1)
+
+except KeyboardInterrupt:
+    spi.close()
+    print("Sistema arrestato.")</code></pre>
+                
+                <h3>Miglioramenti rispetto alla versione base:</h3>
+                <ul>
+                    <li><strong>Filtro passa-basso</strong> per ridurre il rumore sui sensori (<code>moving_average</code>)</li>
+                    <li><strong>Controllo proporzionale</strong> del servo (aggiusta la velocità in base alla differenza di luce)</li>
+                    <li><strong>Supporto SPI</strong> per lettura più stabile dall'ADC</li>
+                </ul>
+            </div>
+        </section>
+        
+        <section id="integrazione">
+            <h2>5. Integrazione con Home Assistant (Opzionale)</h2>
+            
+            <div class="card">
+                <h3>5.1 Configurazione in YAML</h3>
+                <p>Aggiungere in <code>configuration.yaml</code>:</p>
+                <pre><code>sensor:
+  - platform: mqtt
+    name: "LDR1"
+    state_topic: "home/ldr1"
+    unit_of_measurement: "%"
+  - platform: mqtt
+    name: "LDR2"
+    state_topic: "home/ldr2"
+
+automation:
+  - alias: "Regola luce automatica"
+    trigger:
+      platform: numeric_state
+      entity_id: sensor.ldr1
+      above: sensor.ldr2
+    action:
+      service: script.servo_adjust</code></pre>
+                
+                <h3>5.2 Script per MQTT (Python)</h3>
+                <pre><code>import paho.mqtt.client as mqtt
+client = mqtt.Client()
+client.connect("homeassistant.local", 1883)
+client.publish("home/ldr1", str(ldr1 * 100))</code></pre>
+            </div>
+        </section>
+        
+        <section id="test">
+            <h2>6. Test e Calibrazione</h2>
+            
+            <div class="card">
+                <h3>6.1 Procedura</h3>
+                <ol>
+                    <li><strong>Calibrazione LDR</strong>:
+                        <ul>
+                            <li>Coprire un LDR e verificare che i valori letti siano coerenti (es. 0.1 in ombra, 0.9 in luce diretta)</li>
+                        </ul>
+                    </li>
+                    <li><strong>Regolazione Soglia (<code>THRESHOLD</code>)</strong>:
+                        <ul>
+                            <li>Valori più bassi aumentano la sensibilità (rischio di oscillazioni)</li>
+                        </ul>
+                    </li>
+                    <li><strong>Ottimizzazione Servo</strong>:
+                        <ul>
+                            <li>Modificare <code>servo.value -= diff * 0.2</code> per regolare la velocità di risposta</li>
+                        </ul>
+                    </li>
+                </ol>
+                
+                <h3>6.2 Risoluzione Problemi</h3>
+                <ul>
+                    <li><strong>Servo non si muove</strong>: Verificare alimentazione e connessione PWM</li>
+                    <li><strong>Letture instabili</strong>: Aumentare <code>SMOOTHING</code> o aggiungere un condensatore tra GND e segnale LDR</li>
+                </ul>
+            </div>
+
+            
+            <div class="card">
+                <h3>7. Conclusioni e Sviluppi Futuri</h3>
+                
+                <h4>7.1 Riepilogo</h4>
+                <p>Il sistema dimostra come un <strong>Raspberry Pi</strong> possa superare i limiti di Arduino in:</p>
+                <ul>
+                    <li><strong>Elaborazione dati</strong> (filtri, log, cloud)</li>
+                    <li><strong>Integrazione con ecosistemi IoT</strong> (Home Assistant, MQTT)</li>
+                    <li><strong>Adattabilità</strong> (aggiunta di telecamere per riconoscimento ambientale)</li>
+                </ul>
+                
+                <h4>7.2 Idee per Espansioni</h4>
+                <ul>
+                    <li><strong>Machine Learning</strong>: Prevedere l'illuminazione ottimale in base all'ora del giorno</li>
+                    <li><strong>Voice Control</strong>: Integrazione con Alexa/Google Assistant</li>
+                    <li><strong>Dashboard Grafana</strong>: Monitoraggio storico dei consumi luminosi</li>
+                </ul>
+            </div>
+        </section>
+        
+        <section id="database">
+            <h2>8. Database del Sistema</h2>
+            <div class="card">
+                <h3>Struttura del Database</h3>
+                <p>Il sistema utilizza un database MySQL per memorizzare impostazioni, log e dati dei sensori. Per una documentazione completa sulla struttura del database:</p>
+                <a href="database.html" class="btn">Vedi la Documentazione del Database</a>
+            </div>
+        </section>
+    </div>
+    
+
+    
+    <footer>
+        <div class="container">
+            <h3>Controllo di Intensità Luminosa con Raspberry Pi</h3>
+            <p>Un progetto innovativo per l'ottimizzazione energetica</p>
+            <div class="authors">
+                <p><strong>Autori</strong>: Giovanni Crispo, Cristian Memoli</p>
+                <p><strong>Classe</strong>: IV A INF</p>
+                <p><strong>Licenza</strong>: Open Source (GPL 3.0)</p>
+            </div>
+            <p><em>Documentazione aggiornata al 2024</em></p>
+            <div style="display: flex; gap: 1rem; justify-content: center;">
+                <a href="#" class="btn">Scarica il Codice</a>
+                <a href="database.html" class="btn">Vedi il Database</a>
+            </div>
+        </div>
+    </footer>
+    
+    <script>
+        // Smooth scrolling per i link di navigazione
+        document.querySelectorAll('nav a').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+        
+        // Evidenziazione della sezione attiva
+        const sections = document.querySelectorAll('section');
+        const navLinks = document.querySelectorAll('nav a');
+        
+        window.addEventListener('scroll', () => {
+            let current = '';
+            
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                
+                if (pageYOffset >= (sectionTop - 100)) {
+                    current = section.getAttribute('id');
+                }
+            });
+            
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${current}`) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
